@@ -7,7 +7,7 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root
+    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
@@ -29,7 +29,7 @@ module SitemapGenerator
 
       SitemapGenerator::Interpreter.new(self, &block)
       unless self.sitemap.finalized?
-        self.sitemap_index.add(self.sitemap)
+        self.sitemap_index.add(self.sitemap, :host => @sitemaps_host)
         puts self.sitemap.summary if verbose
       end
       self.sitemap_index.finalize!
@@ -52,14 +52,19 @@ module SitemapGenerator
     #
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
-    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil)
+    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil,sitemaps_host = nil)
       @default_host = default_host
       @public_path = public_path
       @sitemaps_path = sitemaps_path
       @exclude_root = exclude_root
+      @sitemaps_host = sitemaps_host
 
       if @public_path.nil?
         @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
+      end
+      
+      if @sitemaps_host.nil?
+        @sitemaps_path = default_host
       end
 
       # Default host is not set yet.  Set it on these objects when `add_links` is called
@@ -92,7 +97,7 @@ module SitemapGenerator
         self.sitemap.add(link, options)
       rescue SitemapGenerator::SitemapError => e
         if e.is_a?(SitemapGenerator::SitemapFullError)
-          self.sitemap_index.add(self.sitemap)
+          self.sitemap_index.add(self.sitemap, :host => @sitemaps_host)
           puts self.sitemap.summary if verbose
         end
         self.sitemap = SitemapGenerator::Builder::SitemapFile.new(public_path, new_sitemap_path, default_host)
@@ -164,6 +169,11 @@ module SitemapGenerator
       self.sitemap.sitemap_path = new_sitemap_path unless self.sitemap.finalized?
     end
 
+    # this obviously is just a quick workaround
+    def sitemaps_host=(value)
+       @sitemaps_host = value
+     end
+     
     protected
 
     # Return the current sitemap filename with index.

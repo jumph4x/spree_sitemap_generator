@@ -1,6 +1,7 @@
 # Set the host name for URL creation
 SitemapGenerator::Sitemap.default_host = "http://www.example.com"
 #SitemapGenerator::Sitemap.exclude_root = false
+#SitemapGenerator::Sitemap.sitemaps_host = "http://blah.s3.amazon.com"
 
 SitemapGenerator::Sitemap.add_links do |sitemap|
   # Put links creation logic here.
