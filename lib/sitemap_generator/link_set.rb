@@ -7,7 +7,7 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host
+    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host,:s3_access_key_id,:s3_secret_access_key,:s3_bucket_name
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
@@ -52,12 +52,17 @@ module SitemapGenerator
     #
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
-    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil,sitemaps_host = nil)
+    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil,sitemaps_host = nil,s3_access_key_id = nil,s3_secret_access_key = nil,s3_bucket_name = nil)
       @default_host = default_host
       @public_path = public_path
       @sitemaps_path = sitemaps_path
       @exclude_root = exclude_root
       @sitemaps_host = sitemaps_host
+      
+      @s3_access_key_id = s3_access_key_id
+      @s3_secret_access_key = s3_secret_access_key
+      @s3_bucket_name = s3_bucket_name
+
 
       if @public_path.nil?
         @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
@@ -174,6 +179,17 @@ module SitemapGenerator
        @sitemaps_host = value
      end
      
+    def s3_access_key_id=(value)
+      @s3_access_key_id = value
+    end
+    def s3_secret_access_key=(value)
+      @s3_secret_access_key = value
+    end
+
+    def s3_bucket_name=(value)
+      @s3_bucket_name = value
+    end
+      
     protected
 
     # Return the current sitemap filename with index.
