@@ -29,7 +29,7 @@ module SitemapGenerator
 
       SitemapGenerator::Interpreter.new(self, &block)
       unless self.sitemap.finalized?
-        self.sitemap_index.add(self.sitemap, :host => @sitemaps_host)
+        self.sitemap_index.add(self.sitemap,"sitemaps" :host => @sitemaps_host)
         puts self.sitemap.summary if verbose
       end
       self.sitemap_index.finalize!
