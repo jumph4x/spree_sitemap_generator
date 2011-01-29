@@ -7,7 +7,7 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_reader :default_host, :public_path, :sitemaps_path
+    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
@@ -52,10 +52,11 @@ module SitemapGenerator
     #
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
-    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil)
+    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil)
       @default_host = default_host
       @public_path = public_path
       @sitemaps_path = sitemaps_path
+      @exclude_root = exclude_root
 
       if @public_path.nil?
         @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
@@ -77,7 +78,8 @@ module SitemapGenerator
 
       # Set default host on the sitemap objects and seed the sitemap with the default links
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
-      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      
+      self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) unless exclude_root
       self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
 
       yield self
@@ -138,6 +140,10 @@ module SitemapGenerator
 
     def link_count
       self.sitemap_index.total_link_count
+    end
+
+    def exclude_root=(value)
+      @exclude_root = value
     end
 
     def default_host=(value)
