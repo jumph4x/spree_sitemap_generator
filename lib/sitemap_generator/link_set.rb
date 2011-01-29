@@ -90,7 +90,7 @@ module SitemapGenerator
       self.sitemap.hostname = self.sitemap_index.hostname = default_host
       
       self.sitemap.add('/', :lastmod => Time.now, :changefreq => 'always', :priority => 1.0) unless exclude_root
-      self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
+      #self.sitemap.add(self.sitemap_index, :lastmod => Time.now, :changefreq => 'always', :priority => 1.0)
 
       yield self
     end
