@@ -17,11 +17,9 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     "Gemfile",
-     "Gemfile.lock",
      "MIT-LICENSE",
      "README.md",
      "Rakefile",
-     "Rakefile.working",
      "VERSION",
      "lib/sitemap_generator.rb",
      "lib/sitemap_generator/builder.rb",
