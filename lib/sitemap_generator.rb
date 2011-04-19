@@ -18,7 +18,7 @@ module SitemapGenerator
     MAX_SITEMAP_IMAGES   = 1_000         # max images per url
     MAX_SITEMAP_FILESIZE = 10.megabytes  # bytes
 
-    Sitemap = LinkSet.new
+    #Sitemap = LinkSet.new
   end
 
   class << self

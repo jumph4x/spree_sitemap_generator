@@ -4,18 +4,19 @@
 namespace :sitemap do
   # Require sitemap_generator only.  When installed as a plugin, the require will fail, so in
   # this case, we have to load the full environment first.
-  task :require do
+  task :require, :site_code do |t, args|
     begin
       require 'sitemap_generator'
     rescue LoadError
-      Rake::Task['sitemap:require_environment'].invoke
+      Rake::Task["sitemap:require_environment"].invoke(args[:site_code])
     end
   end
 
   # Require sitemap_generator after loading the Rails environment.  We still need the require
   # in case we are installed as a gem and are setup to not automatically be required.
-  task :require_environment => :environment do
+  task :require_environment, :site_code, :needs => :environment do |t, args|
     require 'sitemap_generator'
+    SitemapGenerator::Sitemap = SitemapGenerator::LinkSet.new(args[:site_code])
   end
 
   desc "Install a default config/sitemap.rb file"
@@ -29,15 +30,17 @@ namespace :sitemap do
   end
 
   desc "Create Sitemap XML files in public/ directory (rake -s for no output)"
-  task :refresh => ['sitemap:create'] do
+  task :refresh, :site_code, :needs => ['sitemap:create'] do |t, args|
     SitemapGenerator::Sitemap.ping_search_engines
   end
 
   desc "Create Sitemap XML files (don't ping search engines)"
-  task 'refresh:no_ping' => ['sitemap:create']
+  task 'refresh:no_ping', :site_code, :needs => ['sitemap:create'] do |t, args|
+  
+  end
 
-  task :create => ['sitemap:require_environment'] do
+  task :create, :site_code, :needs => ['sitemap:require_environment'] do |t, args|
     SitemapGenerator::Sitemap.verbose = verbose
-    SitemapGenerator::Sitemap.create
+    SitemapGenerator::Sitemap.create(args[:site_code])
   end
 end

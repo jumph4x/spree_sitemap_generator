@@ -7,7 +7,8 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host,:s3_access_key_id,:s3_secret_access_key,:s3_bucket_name
+    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host,
+                :s3_access_key_id,:s3_secret_access_key,:s3_bucket_name, :filename_prefix, :store
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
 
@@ -18,7 +19,11 @@ module SitemapGenerator
     #
     # TODO: Refactor so that we can have multiple instances
     # of LinkSet.
-    def create(&block)
+    def create(site_code, &block)
+      @store = Store.where(:code => site_code).first
+      self.default_host = "http://#{@store.main_domain}"
+      self.filename_prefix = @store.code
+    
       require 'sitemap_generator/interpreter'
 
       start_time = Time.now
@@ -52,7 +57,7 @@ module SitemapGenerator
     #
     # <tt>default_host</tt> hostname including protocol to use in all sitemap links
     #   e.g. http://en.google.ca
-    def initialize(public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil,sitemaps_host = nil,s3_access_key_id = nil,s3_secret_access_key = nil,s3_bucket_name = nil)
+    def initialize(filename_prefix = nil,public_path = nil, sitemaps_path = nil, default_host = nil, exclude_root = nil,sitemaps_host = nil,s3_access_key_id = nil,s3_secret_access_key = nil,s3_bucket_name = nil)
       @default_host = default_host
       @public_path = public_path
       @sitemaps_path = sitemaps_path
@@ -62,7 +67,7 @@ module SitemapGenerator
       @s3_access_key_id = s3_access_key_id
       @s3_secret_access_key = s3_secret_access_key
       @s3_bucket_name = s3_bucket_name
-
+      @filename_prefix  = filename_prefix
 
       if @public_path.nil?
         @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
@@ -189,14 +194,18 @@ module SitemapGenerator
     def s3_bucket_name=(value)
       @s3_bucket_name = value
     end
-      
+    
+    def filename_prefix=(value)
+      @filename_prefix = value
+    end
+    
     protected
 
     # Return the current sitemap filename with index.
     #
     # The index depends on the length of the <tt>sitemaps</tt> array.
     def new_sitemap_path
-      File.join(self.sitemaps_path || '', "sitemap#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
+      File.join(self.sitemaps_path || '', "#{self.filename_prefix}_sitemap#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
     end
 
     # Return the current sitemap index filename.
@@ -204,7 +213,7 @@ module SitemapGenerator
     # At the moment we only support one index file which can link to
     # up to 50,000 sitemap files.
     def sitemap_index_path
-      File.join(self.sitemaps_path || '', 'sitemap_index.xml.gz')
+      File.join(self.sitemaps_path || '', "#{self.filename_prefix}_sitemap_index.xml.gz")
     end
   end
 end

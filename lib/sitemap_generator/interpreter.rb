@@ -27,7 +27,11 @@ module SitemapGenerator
         eval(File.read(sitemap_config_file), nil, sitemap_config_file.to_s)
       end
     end
-
+    
+    def store
+      @sitemap.store
+    end
+    
     def add(*args)
       @sitemap.add(*args)
     end
