@@ -71,7 +71,7 @@ module SitemapGenerator
       @filename_prefix  = filename_prefix
 
       if @public_path.nil?
-        @public_path = File.join(::Rails.root, 'public/') rescue 'public/'
+        @public_path = File.join(::Rails.root, 'tmp/') rescue 'tmp/'
       end
       
       if @sitemaps_host.nil?
