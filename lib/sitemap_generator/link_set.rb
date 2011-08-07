@@ -7,7 +7,7 @@ module SitemapGenerator
   class LinkSet
     include ActionView::Helpers::NumberHelper  # for number_with_delimiter
 
-    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root, :sitemaps_host,
+    attr_reader :default_host, :public_path, :sitemaps_path, :exclude_root,:sitemaps_host,
                 :s3_access_key_id,:s3_secret_access_key,:s3_bucket_name, :filename_prefix, :store
     attr_accessor :sitemap, :sitemap_index
     attr_accessor :verbose, :yahoo_app_id
@@ -22,7 +22,6 @@ module SitemapGenerator
     def create(site_code, &block)
       @store = Store.where(:code => site_code).first
       self.default_host = "http://#{@store.main_domain}"
-      self.sitemaps_host = "http://#{@store.main_domain}"
       self.filename_prefix = @store.code
     
       require 'sitemap_generator/interpreter'
