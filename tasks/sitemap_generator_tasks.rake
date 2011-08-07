@@ -52,11 +52,6 @@ namespace :sitemap do
     SitemapGenerator::Sitemap.create(args[:site_code])
   end
   
-  desc "Make it and send it in one go"
-  task :generate_and_transfer, :site_code, :needs => ['sitemap:create','sitemap:transfer'] do |t, args|
-    
-  end
-  
   desc "Send sitemaps to S3"
   task :transfer, :site_code, :needs => ['sitemap:require_environment'] do |t, args|
     
