@@ -22,6 +22,7 @@ module SitemapGenerator
     def create(site_code, &block)
       @store = Store.where(:code => site_code).first
       self.default_host = "http://#{@store.main_domain}"
+      self.sitemaps_host = "http://#{@store.main_domain}"
       self.filename_prefix = @store.code
     
       require 'sitemap_generator/interpreter'
