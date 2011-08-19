@@ -14,7 +14,7 @@ namespace :sitemap do
 
   # Require sitemap_generator after loading the Rails environment.  We still need the require
   # in case we are installed as a gem and are setup to not automatically be required.
-  task :require_environment, :site_code, :needs => :environment do |t, args|
+  task :require_environment, [:site_code] => :environment do |t, args|
     require 'sitemap_generator'
     SitemapGenerator::Sitemap = SitemapGenerator::LinkSet.new(args[:site_code])
   end
@@ -29,17 +29,17 @@ namespace :sitemap do
     SitemapGenerator::Utilities.clean_files
   end
 
-  desc "Create Sitemap XML files in public/ directory (rake -s for no output)"
-  task :refresh, :site_code, :needs => ['sitemap:create'] do |t, args|
+  desc "Create Sitemap XML files in public/ directory (rake -s for no output). Usage example: rake sitemap:refresh[euro]"
+  task :refresh, [:site_code] => ['sitemap:create'] do |t, args|
     SitemapGenerator::Sitemap.ping_search_engines
   end
 
   desc "Create Sitemap XML files (don't ping search engines)"
-  task 'refresh:no_ping', :site_code, :needs => ['sitemap:create'] do |t, args|
+  task 'refresh:no_ping', [:site_code] => ['sitemap:create'] do |t, args|
   
   end
 
-  task :create, :site_code, :needs => ['sitemap:require_environment'] do |t, args|
+  task :create, [:site_code] => ['sitemap:require_environment'] do |t, args|
     SitemapGenerator::Sitemap.verbose = verbose
     SitemapGenerator::Sitemap.create(args[:site_code])
   end
