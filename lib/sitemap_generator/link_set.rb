@@ -21,8 +21,8 @@ module SitemapGenerator
     # of LinkSet.
     def create(site_code, &block)
       @store = Spree::Store.where(:code => site_code).first
-      self.default_host = "http://#{@store.main_domain}"
-      self.sitemaps_host = "http://#{@store.main_domain}"
+      self.default_host = @store.main_domain_with_protocol
+      self.sitemaps_host = @store.main_domain_with_protocol
       self.filename_prefix = @store.code
     
       require 'sitemap_generator/interpreter'
