@@ -20,9 +20,10 @@ module SitemapGenerator
     # TODO: Refactor so that we can have multiple instances
     # of LinkSet.
     def create(site_code, &block)
-      @store = Spree::Store.where(:code => site_code).first
-      self.default_host = @store.main_domain_with_protocol
-      self.sitemaps_host = @store.main_domain_with_protocol
+      @store = Spree::Store.where(:code => site_code).first || Spree::Store.default
+      host = @store.url.starts_with?('http') ? @store.url : "http://#{@store.url}"
+      self.default_host = host
+      self.sitemaps_host = host
       self.filename_prefix = @store.code
     
       require 'sitemap_generator/interpreter'
