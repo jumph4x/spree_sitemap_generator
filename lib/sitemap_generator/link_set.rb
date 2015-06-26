@@ -19,13 +19,11 @@ module SitemapGenerator
     #
     # TODO: Refactor so that we can have multiple instances
     # of LinkSet.
-    def create(site_code, &block)
-      @store = Spree::Store.where(:code => site_code).first || Spree::Store.default
-      host = @store.url.starts_with?('http') ? @store.url : "http://#{@store.url}"
+    def create(&block)
+      host = "https://#{Spree::Config[:site_url]}"
       self.default_host = host
       self.sitemaps_host = host
-      self.filename_prefix = @store.code
-    
+
       require 'sitemap_generator/interpreter'
 
       start_time = Time.now
@@ -207,7 +205,7 @@ module SitemapGenerator
     #
     # The index depends on the length of the <tt>sitemaps</tt> array.
     def new_sitemap_path
-      File.join(self.sitemaps_path || '', "#{self.filename_prefix}_sitemap#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
+      File.join(self.sitemaps_path || '', "sitemap#{self.sitemap_index.sitemaps.length + 1}.xml.gz")
     end
 
     # Return the current sitemap index filename.
@@ -215,7 +213,7 @@ module SitemapGenerator
     # At the moment we only support one index file which can link to
     # up to 50,000 sitemap files.
     def sitemap_index_path
-      File.join(self.sitemaps_path || '', "#{self.filename_prefix}_sitemap_index.xml.gz")
+      File.join(self.sitemaps_path || '', "sitemap_index.xml.gz")
     end
   end
 end
